@@ -48,19 +48,31 @@ app.delete('/api/notes/:id', (req, res) => {
   res.status(204).end();
 });
 
-app.post('/api/notes', (req, res) => {
-  const { content, important } = req.body || {};
-  if (!content || typeof content !== 'string') {
-    return res.status(400).json({ error: 'content is required' });
+app.post('/api/notes', (request, response) => {
+  const body = request.body;
+
+  if (!body || !body.content) {
+    return response.status(400).json({ error: 'content missing' });
   }
 
-  const newNote = { content, important: !!important, id: getMaxId() };
-  notes = [newNote, ...notes];
+  const newNote = {
+    content: body.content,
+    important: body.important || false,
+    id: generateId(),
+  };
+
+  notes = notes.concat(newNote);
   console.log('Added note', newNote);
-  console.res.status(201).json(newNote);
+  return response.status(201).json(newNote);
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log('server running on port', PORT);
 });
+
+function generateId() {
+  const ids = notes.map((note) => Number(note.id) || 0);
+  const next = Math.max(0, ...ids) + 1;
+  return String(next);
+}
