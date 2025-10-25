@@ -26,12 +26,6 @@ let notes = [
   },
 ];
 
-const getMaxId = () => {
-  const ids = notes.map((note) => Number(note.id) || 0);
-  const next = Math.max(0, ...ids) + 1;
-  return String(next);
-};
-
 app.get('/api/notes', (req, res) => {
   res.json(notes);
 });
